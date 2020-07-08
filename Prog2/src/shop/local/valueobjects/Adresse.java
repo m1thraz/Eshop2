@@ -1,54 +1,64 @@
-package shop.local.valueobjects;
+package shop.local.valueObjects;
+
 
 public class Adresse {
+	
+	/**
+	 * Diese Klasse erstellt ein Adressenobjekt aus den Parametern 
+	 * @param strasse
+	 * @param hausNr
+	 * @param plz
+	 * @param ort 
+	 *
+	 */
 
-		protected String strasse = null;
-		protected String hausNr = null;
-		protected String plz = null;
-		protected String ort = null;
+	private String strasse = null;
+	private String hausNr = null;
+	private String plz = null;
+	private String ort = null;
 
-		public Adresse(String strasse, String hausNr, String plz, String ort) {
-			this.strasse = strasse;
-			this.hausNr = hausNr;
-			this.plz = plz;
-			this.ort = ort;
-		}
+	public Adresse(String strasse, String hausNr, String plz, String ort) {
+		this.strasse = strasse;
+		this.hausNr = hausNr;
+		this.plz = plz;
+		this.ort = ort;
+	}
 
-		public String getStrasse() {
-			return strasse;
-		}
-		
-		public void setStrasse(String strasse) {
-			this.strasse = strasse;
-		}
+	public String getStrasse() {
+		return strasse;
+	}
 
-		public String getHausNr() {
-			return hausNr;
-		}
-		
-		public void setHausNr(String hausNr) {
-			this.hausNr = hausNr;
-		}
+	public void setStrasse(String strasse) {
+		this.strasse = strasse;
+	}
 
-		public String getPlz() {
-			return plz;
-		}
+	public String getHausNr() {
+		return hausNr;
+	}
 
-		public void setPlz(String plz) {
-			this.plz = plz;
-		}
-		
-		public String getOrt() {
-			return ort;
-		}
+	public void setHausNr(String hausNr) {
+		this.hausNr = hausNr;
+	}
 
-		public void setOrt(String ort) {
-			this.ort = ort;
-		}
+	public String getPlz() {
+		return plz;
+	}
 
-		public String toString() {
-			return 	"Ort:\t\t\t" + ort + "\n" +
-					"PLZ:\t\t\t" + plz + "\n" +
-					"Strasse/Hausnummer:\t" + strasse + ", " + hausNr + "\n"; 
-		}
+	public void setPlz(String plz) {
+		this.plz = plz;
+	}
+
+	public String getOrt() {
+		return ort;
+	}
+
+	public void setOrt(String ort) {
+		this.ort = ort;
+	}
+
+	@Override
+	public String toString() {
+		return "Ort:\t\t\t" + ort + "\n" + "PLZ:\t\t\t" + plz + "\n" + "Strasse/Hausnummer:\t" + strasse + ", " + hausNr
+				+ "\n";
+	}
 }

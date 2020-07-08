@@ -1,17 +1,14 @@
 package shop.local.domain.exceptions;
 
+import shop.local.valueObjects.Mitarbeiter;
 
-import shop.local.valueobjects.*;
-
-public class MitarbeiterExistiertBereitsException extends Exception{
-	
+public class MitarbeiterExistiertBereitsException extends Exception {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	
 	public MitarbeiterExistiertBereitsException(Mitarbeiter mitarbeiter) {
 		super("Mitarbeiter: " + mitarbeiter.getLoginName() + " existiert bereits!");
 	}

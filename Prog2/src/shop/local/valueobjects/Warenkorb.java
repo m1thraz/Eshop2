@@ -1,25 +1,24 @@
-package shop.local.valueobjects;
+package shop.local.valueObjects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class Warenkorb {
 
 	private Artikel artikel;
 	private Map<Artikel, Integer> inhalt;
 	private Kunde kunde;
-	
-	public Warenkorb(Artikel artikel, Kunde kunde) {
-        this.artikel = artikel;
-        this.kunde = kunde;
-    }
 
-	public Warenkorb() {	                       
+	public Warenkorb(Artikel artikel, Kunde kunde) {
+		this.artikel = artikel;
+		this.kunde = kunde;
+	}
+
+	public Warenkorb() {
 		inhalt = new HashMap<Artikel, Integer>();
-		this.kunde=null;
+		kunde = null;
 	}
 
 	public Map<Artikel, Integer> getInhalt() {
@@ -29,63 +28,59 @@ public class Warenkorb {
 	public void setInhalt(Map<Artikel, Integer> inhalt) {
 		this.inhalt = inhalt;
 	}
-	
+
 	public Kunde getKunde() {
-		return this.kunde;
+		return kunde;
 	}
-		
+
 	public Artikel getArtikel() {
-        return artikel;
-    }
-		
+		return artikel;
+	}
+
 	public void setKunde(Kunde kunde) {
-		this.kunde=kunde;
+		this.kunde = kunde;
 	}
-		
+
 	public void warenkorbLeeren() {
-		this.inhalt.clear();
+		inhalt.clear();
 	}
-	
+
 	public void artikelLoeschen(Artikel artikel, int anzahl) {
-		//this.inhalt.remove(artikel, anzahl);
-		
-		this.inhalt.replace(artikel, inhalt.get(artikel)-anzahl);
-		if(inhalt.get(artikel)<= 0){
+		inhalt.replace(artikel, inhalt.get(artikel) - anzahl);
+		if (inhalt.get(artikel) <= 0) {
 			inhalt.remove(artikel);
-			
 		}
 	}
-	
+
 	public void artikelHinzufuegen(Artikel artikel, int anzahl) {
-		if(this.inhalt.containsKey(artikel))	{
-			this.inhalt.replace(artikel, this.inhalt.get(artikel) + anzahl);
-		}else { 
-			this.inhalt.put(artikel, anzahl);
+		if (inhalt.containsKey(artikel)) {
+			inhalt.replace(artikel, inhalt.get(artikel) + anzahl);
+		} else {
+			inhalt.put(artikel, anzahl);
 		}
 	}
-	
-	public List<Artikel> toList(){
+
+	public List<Artikel> toList() {
 		List<Artikel> warenkorbListe = new ArrayList<>();
-		for(Artikel a : inhalt.keySet()) {
+		for (Artikel a : inhalt.keySet()) {
 			new Artikel(a.getBezeichnung(), a.getArtNr(), a.getPreis(), inhalt.get(a));
 			warenkorbListe.add(new Artikel(a.getBezeichnung(), a.getArtNr(), a.getPreis(), inhalt.get(a)));
 		}
-		
+
 		return warenkorbListe;
 	}
-	
-	//TODO	in RechnungSservice verlagern
- public double rechneGesamtpreis() {
-		double gesamtpreis=0;
-		for(Map.Entry<Artikel, Integer> entry: this.getInhalt().entrySet()) {
-			gesamtpreis+=entry.getKey().getPreis()*entry.getValue();
+
+	public double rechneGesamtpreis() {
+		double gesamtpreis = 0;
+		for (Map.Entry<Artikel, Integer> entry : getInhalt().entrySet()) {
+			gesamtpreis += entry.getKey().getPreis() * entry.getValue();
 		}
 		return gesamtpreis;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Warenkorb: " + inhalt +"\n\n" +"Gesamtpreis: " + rechneGesamtpreis() +" €";
+		return "Warenkorb: " + inhalt + "\n\n" + "Gesamtpreis: " + rechneGesamtpreis() + " €";
 	}
 
 }

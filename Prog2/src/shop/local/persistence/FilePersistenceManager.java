@@ -8,21 +8,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import shop.local.domain.exceptions.MitarbeiterNichtVorhandenException;
-import shop.local.valueobjects.*;
-
-
-
+import shop.local.valueObjects.Adresse;
+import shop.local.valueObjects.Artikel;
+import shop.local.valueObjects.Kunde;
+import shop.local.valueObjects.Massengutartikel;
+import shop.local.valueObjects.Mitarbeiter;
 
 public class FilePersistenceManager implements PersistenceManager {
 
 	private BufferedReader reader = null;
 	private PrintWriter writer = null;
 
+	@Override
 	public void openForReading(String datei) throws FileNotFoundException {
 		reader = new BufferedReader(new FileReader(datei));
 	}
 
+	@Override
 	public void openForWriting(String datei) throws IOException {
 		writer = new PrintWriter(new BufferedWriter(new FileWriter(datei)));
 	}
@@ -38,7 +40,8 @@ public class FilePersistenceManager implements PersistenceManager {
 		if (writer != null)
 			writer.println(daten);
 	}
-	
+
+	@Override
 	public boolean close() {
 		if (writer != null)
 			writer.close();
@@ -56,21 +59,21 @@ public class FilePersistenceManager implements PersistenceManager {
 		return true;
 	}
 
-	
-	//-------------------------------------------Artikel Methoden/Funktionen------------------------------------------------------
+	// ---------------------------------Artikel Methoden/Funktionen----------------------------------------
 
+	@Override
 	public Artikel ladeArtikel() throws IOException {
-		
+
 		// Titel einlesen
 		String titel = liesZeile();
-		if (titel == null) {			
+		if (titel == null) {
 			return null;
 		}
 		// Nummer einlesen ...
 		String nummerString = liesZeile();
 		// ... und von String in int konvertieren
 		int nummer = Integer.parseInt(nummerString);
-				
+
 		// Preis einlesen
 		String preisString = liesZeile();
 		// ... und von String in int konvertieren
@@ -79,36 +82,35 @@ public class FilePersistenceManager implements PersistenceManager {
 		String bestandString = liesZeile();
 		// ... und von String in int konvertieren
 		int bestand = Integer.parseInt(bestandString);
-			// keine Daten mehr vorhanden
+		// keine Daten mehr vorhanden
 		String einheitsString = liesZeile();
 		int einheit = Integer.parseInt(einheitsString);
+		//einheit 1 = normaler Artikel, einheit größer 1 = Massengutartikel
 		if (einheit == 1) {
 			return new Artikel(titel, nummer, preis, bestand);
-		}
-		else {
+		} else {
 			return new Massengutartikel(titel, nummer, preis, bestand, einheit);
-		
-	} 
+		}
 	}
 
-	
-
+	@Override
 	public boolean speichereArtikel(Artikel b) throws IOException {
-		//hier wird der Arikel in der Datei gespeciher
+		// hier wird der Arikel in der Datei gespeciher
 		// 1. Bezeichnung 2.ArtNr 3. Verfuegbar 4. Preis 5.Bestand
-	    schreibeZeile(b.getBezeichnung());
-		schreibeZeile(b.getArtNr() + "");		
+		schreibeZeile(b.getBezeichnung());
+		schreibeZeile(b.getArtNr() + "");
 		schreibeZeile(b.getPreis() + "");
-		schreibeZeile(b.getBestand()+ "");
-		if(b instanceof Massengutartikel )
+		schreibeZeile(b.getBestand() + "");
+		if (b instanceof Massengutartikel)
 			schreibeZeile(((Massengutartikel) b).getEinheit() + "");
-		else 
+		else
 			schreibeZeile("1");
 		return true;
 	}
-	
-	//--------------------------------------------------Kunden Methoden/Funktionen--------------------------------------------
-	
+
+	// ----------------------------------Kunden Methoden/Funktionen-------------------------------------
+
+	@Override
 	public Kunde ladeKunde() throws IOException {
 		String vorname = liesZeile();
 		if (vorname == null) {
@@ -116,44 +118,29 @@ public class FilePersistenceManager implements PersistenceManager {
 			return null;
 		}
 		String nachname = liesZeile();
-		if (nachname == null) {
-			// keine Daten mehr vorhanden
-			return null;
-		}
+		
 		String loginName = liesZeile();
-		if (loginName == null) {
-			return null;
-		}
+		
 		String pw = liesZeile();
-		if (pw == null) {			
-			return null;
-		}
 		
 		String strasse = liesZeile();
-		if (strasse == null) {			
-			return null;
-		}
-		
 		
 		String hausNr = liesZeile();
-		if (hausNr == null) {			
-			return null;
-		}
+		
 		String plz = liesZeile();
-		if (plz == null) {			
-			return null;
-		}
+		
 		String ort = liesZeile();
-		if (ort == null) {			
-			return null;
-		}
-		Adresse adresse =new Adresse( strasse, hausNr, plz, ort);
-		return new Kunde(vorname, nachname, loginName, pw, adresse );
+		
+		Adresse adresse = new Adresse(strasse, hausNr, plz, ort);
+		return new Kunde(vorname, nachname, loginName, pw, adresse);
 	}
-	
+
+	/**
+	 * Kunde wird in Datei gerspeichert
+	 * 1. Vorname 2.Nachname 3. Login 4. Passwort 5.Adresse
+	 */
+	@Override
 	public boolean speichereKunde(Kunde k) throws IOException {
-		// Kunde  wird in Datei gerspeichert
-		// 1. Vorname 2.Nachname 3. Login 4. Passwort 5.Adresse		
 		schreibeZeile(k.getVorname() + "");
 		schreibeZeile(k.getNachname() + "");
 		schreibeZeile(k.getLoginName() + "");
@@ -162,52 +149,39 @@ public class FilePersistenceManager implements PersistenceManager {
 		schreibeZeile(k.getAdresse().getHausNr() + "");
 		schreibeZeile(k.getAdresse().getPlz() + "");
 		schreibeZeile(k.getAdresse().getOrt() + "");
-		
+
 		return true;
 	}
-	
-	//---------------------------------------------Mitarbeiter Methoden/Funktionen---------------------------------------------
-	
-	public Mitarbeiter ladeMitarbeiter() throws Exception, MitarbeiterNichtVorhandenException {
-		
+
+	// --------------------------------Mitarbeiter Methoden/Funktionen-------------------------------------
+
+	@Override
+	public Mitarbeiter ladeMitarbeiter() throws Exception {
+
 		String vorname = liesZeile();
 		if (vorname == null) {
-		
 			return null;
 		}
 
 		String nachname = liesZeile();
-		if (nachname == null) {		
-			return null;
-		}
-	
+		
 		String loginName = liesZeile();
-		if (loginName == null) {
-			return null;
-		}
 		
 		String pw = liesZeile();
-		if (pw == null) {			
-			return null;
-		}
-		
+
 		return new Mitarbeiter(vorname, nachname, loginName, pw);
 	}
-	
+
+	/**
+	 * Kunde wird in Datei gerspeichert
+	 * 1. Vorname 2.Nachname 3. Login 4. Passwort 5.Adresse
+	 */
+	@Override
 	public boolean speichereMitarbeiter(Mitarbeiter m) {
-		// Kunde  wird in Datei gerspeichert
-		// 1. Vorname 2.Nachname 3. Login 4. Passwort 5.Adresse		
 		schreibeZeile(m.getVorname() + "");
 		schreibeZeile(m.getNachname() + "");
 		schreibeZeile(m.getLoginName() + "");
 		schreibeZeile(m.getPw() + "");
 		return true;
-	}
-	
-	//-----------------------------------------------Warenkorb Methoden/Funktionen------------------------------------------------
-
-	@Override
-	public Warenkorb ladeWarenkorb() throws IOException {
-		return null;
 	}
 }

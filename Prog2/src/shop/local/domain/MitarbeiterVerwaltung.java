@@ -9,75 +9,89 @@ import shop.local.domain.exceptions.LoginUngueltigException;
 import shop.local.domain.exceptions.MitarbeiterExistiertBereitsException;
 import shop.local.persistence.FilePersistenceManager;
 import shop.local.persistence.PersistenceManager;
-import shop.local.valueobjects.Mitarbeiter;
+import shop.local.valueObjects.Mitarbeiter;
 
 public class MitarbeiterVerwaltung {
-	
+
 	private PersistenceManager pm = new FilePersistenceManager();
-	private List<Mitarbeiter> mitarbeiterBestand = new ArrayList<>();	
-
-    public void registrieren(String vorname, String nachname, String loginName, String passwort) {
-    	mitarbeiterBestand.add(new Mitarbeiter(vorname, nachname, loginName, passwort));
-    } 	
+	private List<Mitarbeiter> mitarbeiterBestand = new ArrayList<>();
 	
-    public Mitarbeiter einloggen(String login, String passwort) throws LoginUngueltigException {  
-        return sucheNachLogin(login,passwort);
-    }
-	
-    private Mitarbeiter sucheNachLogin(String login, String passwort) throws LoginUngueltigException {
+	/**
+	 * In dieser Methode wird ein Mitarbeite den man hinzufügen will erstmal
+	 * überprüft, ob er schon im Bestand vorhanden ist wenn nicht wird er angelegt
+	 * wenn er schon vorhanden ist wird eine Exception geworfen
+	 * 
+	 * @param einMitarbeiter
+	 * @throws MitarbeiterExistiertBereitsException
+	 */
+	public void einfuegen(Mitarbeiter einMitarbeiter) throws MitarbeiterExistiertBereitsException {
+		for (Mitarbeiter b : mitarbeiterBestand) {
+			if (b.getLoginName().equals(einMitarbeiter.getLoginName())) {
+				throw new MitarbeiterExistiertBereitsException(einMitarbeiter);
+			}
+		}
+		mitarbeiterBestand.add(einMitarbeiter);
+	}
 
-        for (Mitarbeiter mitarbeiter : mitarbeiterBestand) {
-            if (mitarbeiter.getLoginName().equals(login) && mitarbeiter.getPw().equals(passwort) ) {
-                return mitarbeiter;
-            }
-        }
-        throw new LoginUngueltigException(login);
-    }
-    
-    
-    public List<Mitarbeiter> sucheMitarbeiter(String login) {	   
-        List<Mitarbeiter> suchErg = new ArrayList<>();
+	/**
+	 * Hier wird der Mitarbeiter zunächst gesucht, wenn dies Erfolgreich war, 
+	 * wird geprüft, ob der Login übereinstimmt 
+	 * Wenn dies nicht der Fall ist, wird eine Exception geworfen
+	 * @param login
+	 * @param passwort
+	 * @return
+	 * @throws LoginUngueltigException
+	 */
+	public Mitarbeiter einloggen(String login, String passwort) throws LoginUngueltigException {
 
-        // Artikelbestand durchlaufen und nach Titel suchen
-        Iterator<Mitarbeiter> iter = mitarbeiterBestand.iterator();	      
-        while (iter.hasNext()) {
-       
+		Mitarbeiter mitarbeiter = sucheNachLogin(login, passwort);
+		return mitarbeiter;
+	}
+
+	/**
+	 * Interne Methode die prüft, ob Mitarbeiter im Mitarbeiterbestand vorhanden ist 
+	 * @param login
+	 * @param passwort
+	 * @return
+	 * @throws LoginUngueltigException
+	 */
+	private Mitarbeiter sucheNachLogin(String login, String passwort) throws LoginUngueltigException {
+
 		for (Mitarbeiter mitarbeiter : mitarbeiterBestand) {
-			if ((mitarbeiter).getLoginName().equals(login))
-				suchErg.add(mitarbeiter);
-		}		
-        
-    }
-		return suchErg;
-    }
-    
-	
-    public void liesDaten(String datei) throws  Exception{
-        // PersistenzManager für Lesevorgänge öffnen
-        pm.openForReading(datei);
+			if (mitarbeiter.getLoginName().equals(login) && mitarbeiter.getPw().equals(passwort)) {
+				return mitarbeiter;
+			}
+		}
+		throw new LoginUngueltigException(login);
+	}
 
-        Mitarbeiter einMitarbeiter ;        
-        do {    
-        
-				einMitarbeiter = pm.ladeMitarbeiter();		
-            if (einMitarbeiter != null) {
-                einfuegen(einMitarbeiter);
-            }
-        } while (einMitarbeiter != null);
+	/**
+	 * Mitarbeiter werden aus einer externen Datei gelesen
+	 * @param datei
+	 * @throws Exception
+	 */
+	public void liesDaten(String datei) throws Exception {
+		pm.openForReading(datei);
 
-        // Persistenz-Schnittstelle wieder schließen
-        pm.close();
-    }
-	
-	
-		/**
-		 * Mit dieser Methode wird der Mitarbeiter gespeichert in der Datei
-		 * @param datei
-		 * @throws IOException
-		 */
-	   public void schreibeDaten(String datei) throws IOException  {
-	        // PersistenzManager für Schreibvorgänge öffnen
-	        pm.openForWriting(datei);
+		Mitarbeiter einMitarbeiter;
+		do {
+
+			einMitarbeiter = pm.ladeMitarbeiter();
+			if (einMitarbeiter != null) {
+				einfuegen(einMitarbeiter);
+			}
+		} while (einMitarbeiter != null);
+		pm.close();
+	}
+
+	/**
+	 * Mit dieser Methode wird der Mitarbeiter gespeichert in der Datei
+	 * 
+	 * @param datei
+	 * @throws IOException
+	 */
+	public void schreibeDaten(String datei) throws IOException {
+		pm.openForWriting(datei);
 
 		Iterator<Mitarbeiter> iter = mitarbeiterBestand.iterator();
 		while (iter.hasNext()) {
@@ -85,30 +99,14 @@ public class MitarbeiterVerwaltung {
 			pm.speichereMitarbeiter(m);
 		}
 		pm.close();
-	   }
-	   
-	  /**
-	   * In dieser Methode wird ein Mitarbeite den man hinzufügen will erstmal überprüft, 
-	   * ob er schon im Bestand vorhanden ist
-	   * wenn nicht wird er angelegt
-	   * wenn er schon vorhanden ist wird eine Exception geworfen 
-	   * @param einMitarbeiter
-	   * @throws MitarbeiterExistiertBereitsException
-	   */
-	  public void einfuegen (Mitarbeiter einMitarbeiter) throws MitarbeiterExistiertBereitsException  {
-		   for(Mitarbeiter b:mitarbeiterBestand) {
-				if(b.getLoginName().equals(einMitarbeiter.getLoginName())) {
-					throw new MitarbeiterExistiertBereitsException(einMitarbeiter);
-				}
-		   }
-	        // das übernimmt der Vector:
-	        mitarbeiterBestand.add(einMitarbeiter);
-	  }
-	   
-	   public List<Mitarbeiter> getMitarbeiterBestand() {
-	        return new ArrayList<>(mitarbeiterBestand);
-	    }
-	
-}
+	}
 
-	
+//	/**
+//	 * Gibt eine Liste des Mitarbeiterbestandes zurück
+//	 * @return
+//	 */
+//	public List<Mitarbeiter> getMitarbeiterBestand() {
+//		return new ArrayList<>(mitarbeiterBestand);
+//	}
+
+}

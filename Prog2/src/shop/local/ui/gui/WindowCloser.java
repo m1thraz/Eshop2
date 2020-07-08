@@ -1,20 +1,21 @@
 package shop.local.ui.gui;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class WindowCloser extends WindowAdapter{
+import javax.swing.JOptionPane;
 
-	    @Override
-	    public void windowClosing(WindowEvent e) {
-	        Window window = e.getWindow();
-	        int result = JOptionPane.showConfirmDialog(window, "Wollen Sie die Anwendung wirklich beenden?");
-	        if (result == 0) {
-	            window.setVisible(false);
-	            window.dispose();
-	            System.exit(0);
-	        }
-	    }
+public class WindowCloser extends WindowAdapter {
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		Window window = e.getWindow();
+		int result = JOptionPane.showConfirmDialog(window, "Wollen Sie die Anwendung wirklich beenden?");
+		if (result == 0) {
+			window.setVisible(false);
+			window.dispose();
+			System.exit(0);
+		}
+	}
 }
